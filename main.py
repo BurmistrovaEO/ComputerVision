@@ -37,30 +37,32 @@ if __name__ == '__main__':
                'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     model = NeuralNet()
-    loss = CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.001)
+    loss_f = CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), lr=0.001,  momentum=0.9)
 
 
-    epochs = 20
+    epochs = 3
 
     for epoch in range(epochs):
         train_loss = 0.0
         valid_loss = 0.0
         model.train()
-        for batch in trainloader:
+        for i, batch in enumerate(trainloader,0):
              optimizer.zero_grad()
              input, target = batch
-             print(batch[0].shape, batch[1].shape)
+             #print(batch[0].shape, batch[1].shape)
              output = model(input)
-             print(output.shape, target.shape)
-             loss = loss(output, target)
+             #print(output.shape, target.shape)
+             loss = loss_f(output, target)
              loss.backward()
              optimizer.step()
              train_loss += loss.item()
 
+             if i % 2000 == 1999:  # print every 2000 mini-batches
+                 print('[%d, %5d] loss: %.3f' %
+                     (epoch + 1, i + 1, train_loss / 2000))
+                 train_loss = 0.0
+        #train_loss /= len(train_loss)
 
-             print('loss: %.3f' %(train_loss / 2000))
-             running_loss = 0.0
-        train_loss /= len(train_loss)
 
     print("Triaining done!")
